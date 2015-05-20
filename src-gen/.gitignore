@@ -4,3 +4,5 @@
 /GlacierBaseVisitor.java
 /GlacierBaseListener.java
 /Glacier.tokens
+/GlacierLexer.java
+/GlacierLexer.tokens

@@ -1,4 +1,4 @@
-package glacier;
+package glacier.util;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -282,6 +282,7 @@ public class ExtendedLexer implements TokenSource {
 		Pair<TokenSource, CharStream> source = sourcePair;
 		int channel = 0;
 		CommonToken t = new CommonToken(source, type, channel, start, stop);
+		t.setText(text);
 		return t;
 	}
 

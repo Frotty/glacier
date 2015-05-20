@@ -1,4 +1,4 @@
-package glacier;
+package glacier.util;
 
 public class LineOffsets {
 	int[] offsets = new int[128];

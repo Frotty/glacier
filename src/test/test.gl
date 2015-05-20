@@ -1,4 +1,4 @@
-shader Test
+shader GBuffer
 
 vert
 	inout
@@ -14,7 +14,7 @@ vert
 		gl_Pos = mats.mvp * in.pos
 		
 frag
-	mout
+	inout
 		albedo, normals, aux, pos
 	matrices
 		view
@@ -33,7 +33,7 @@ frag
 		o_aux = vec4(u_mat, 1.0)
 		o_pos = v_pos
 
-	mat4 cotangent_frame( vec3 N, vec3 p, vec2 uv )
+	mat3 cotangent_frame( vec3 N, vec3 p, vec2 uv )
 		// get edge vectors of the pixel triangle
 		vec3 dp1 = dFdx( p )
 		vec3 dp2 = dFdy( p )

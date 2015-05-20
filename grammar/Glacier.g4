@@ -11,49 +11,69 @@ package antlr4;
 
 shaderProg
 :
-	'shader' IDENTIFIER NL+ vertexShader fragmentShader
+	'shader' shaderName = IDENTIFIER NL+ vertexShader fragmentShader
 ;
 
 functionBlock
 :
-	IDENTIFIER IDENTIFIER '(' arguments ')' NL statementsBlock
+	returnType=IDENTIFIER funcName=IDENTIFIER '(' arguements=arguments ')' NL body=statementsBlock
 ;
 
 vertexShader
 :
-	'vert' NL+ STARTBLOCK? shaderBlock ENDBLOCK NL*
+	'vert' NL+ STARTBLOCK? vshaderBlock ENDBLOCK NL*
 ;
 
 fragmentShader
 :
-	'frag' NL+ STARTBLOCK? shaderBlock ENDBLOCK NL*
+	'frag' NL+ STARTBLOCK? vshaderBlock ENDBLOCK NL*
 ;
 
-shaderBlock
+varDef
+:
+	varType = IDENTIFIER? varName = IDENTIFIER
+;
+
+arguments
 :
 	(
+		vardefs += varDef
 		(
-			'inout'
-			| 'mout'
-		) NL+ STARTBLOCK arguments NL+ ENDBLOCK
+			',' vardefs += varDef
+		)*
+	)?
+;
+
+vshaderBlock
+:
+	(
+		'inout' NL+ STARTBLOCK inoutArgs = arguments NL+ ENDBLOCK
 	)?
 	(
-		'matrices' NL+ STARTBLOCK arguments NL+ ENDBLOCK
+		'in' NL+ STARTBLOCK inArgs = arguments NL+ ENDBLOCK
 	)?
 	(
-		'uniforms' NL+ STARTBLOCK uniformBlock NL+ ENDBLOCK
+		'out' NL+ STARTBLOCK outArgs = arguments NL+ ENDBLOCK
 	)?
 	(
-		'main()' NL+ statementsBlock
-	)? 
-	functionBlock*
+		'matrices' NL+ STARTBLOCK matsArgs = arguments NL+ ENDBLOCK
+	)?
+	(
+		'uniforms' NL+ STARTBLOCK uniformArgs = uniformBlock NL* ENDBLOCK
+	)?
+	(
+		'main()' NL+ mainFunc = statementsBlock
+	)? functions += functionBlock*
 ;
 
 uniformBlock
 :
-	(
-		IDENTIFIER IDENTIFIER NL
-	)+
+	uniforms += uniformDef+
+;
+
+uniformDef
+:
+	uniformType = IDENTIFIER uniformName = IDENTIFIER NL
 ;
 
 statementsBlock
@@ -161,16 +181,6 @@ localVarDef
 	)?
 ;
 
-arguments
-:
-	(
-		IDENTIFIER? IDENTIFIER
-		(
-			',' IDENTIFIER? IDENTIFIER
-		)*
-	)?
-;
-
 expr
 :
 	exprPrimary
@@ -211,7 +221,7 @@ expr
 	| op = 'not' right = expr
 	| left = expr op = 'and' right = expr
 	| left = expr op = 'or' right = expr
-	|
+	| ieDirective '.' IDENTIFIER
 ;
 
 exprPrimary
@@ -236,9 +246,20 @@ exprAssignable
 	| exprVarAccess
 ;
 
+ieDirective
+:
+	(
+		'in'
+		| 'out'
+	)
+;
+
 exprMemberVar
 :
-	expr dots =
+	(
+		expr
+		| ieDirective
+	) dots =
 	(
 		'.'
 		| '..'
