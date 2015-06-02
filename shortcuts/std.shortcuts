@@ -1,0 +1,19 @@
+Prefixes:
+
+
+Geometry:
+"pos" "vec3" "position"
+"normal" "vec3" "normal"
+"texCoord" "vec2" "texCoord0"
+
+Camera:
+"world", "mat4", "worldTrans"
+"view", "mat4", "viewTrans"
+"proj", "mat4", "projTrans"
+"normal", "mat3", "normalTrans"
+"mvp", "mat4", "mvpTrans"
+
+Functions:
+vec4 norm(vec4 v) -> normalize
+vec3 norm(vec3 v) -> normalize
+vec2 norm(vec2 v) -> normalize

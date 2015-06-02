@@ -16,8 +16,6 @@ import antlr4.GlacierParser.FragmentShaderContext;
 import antlr4.GlacierParser.FunctionBlockContext;
 import antlr4.GlacierParser.ShaderProgContext;
 import antlr4.GlacierParser.StatementsBlockContext;
-import antlr4.GlacierParser.UniformBlockContext;
-import antlr4.GlacierParser.UniformDefContext;
 import antlr4.GlacierParser.VarDefContext;
 import antlr4.GlacierParser.VertexShaderContext;
 
@@ -87,29 +85,29 @@ public class Reader {
 //		parseIOArgs(fragShader.vshaderBlock().inoutArgs);
 //		parseIArgs(fragShader.vshaderBlock().inArgs);
 //		parseOArgs(fragShader.vshaderBlock().outArgs);
-		parseMatrices(fragShader.vshaderBlock().matsArgs);
-		parseUniforms(fragShader.vshaderBlock().uniformArgs);
+//		parseMatrices(fragShader.vshaderBlock().matsArgs);
+//		parseUniforms(fragShader.vshaderBlock().uniformArgs);
 	}
 
 	private void readVertShader(VertexShaderContext vertShader) throws IOException {
-		parseIOArgs(vertShader.vshaderBlock().inoutArgs);
-		parseIArgs(vertShader.vshaderBlock().inArgs);
-		parseOArgs(vertShader.vshaderBlock().outArgs);
-		parseMatrices(vertShader.vshaderBlock().matsArgs);
-		parseUniforms(vertShader.vshaderBlock().uniformArgs);
-		readFunctions(vertShader.vshaderBlock().functionBlock());
-		readMain(vertShader.vshaderBlock().mainFunc);
+//		parseIOArgs(vertShader.vshaderBlock().inoutArgs);
+//		parseIArgs(vertShader.vshaderBlock().inArgs);
+//		parseOArgs(vertShader.vshaderBlock().outArgs);
+//		parseMatrices(vertShader.vshaderBlock().matsArgs);
+//		parseUniforms(vertShader.vshaderBlock().uniformArgs);
+//		readFunctions(vertShader.vshaderBlock().functionBlock());
+//		readMain(vertShader.vshaderBlock().mainFunc);
 	}
 	
 
 	private void readMain(StatementsBlockContext mainFunc) {
-		addFunction(new Function("main", new String[]{}, "void", mainFunc.getText(), true));
+		addFunction(new Function("main", new String[]{}, "void", mainFunc, true));
 	}
 
 	private void readFunctions(List<FunctionBlockContext> functionBlock) {
 		for(FunctionBlockContext f : functionBlock) {
 			String[] args = parseArgs(f.arguements);
-			addFunction(new Function(f.funcName.getText(), args, f.returnType.getText(), f.body.getText(), false));
+			addFunction(new Function(f.funcName.getText(), args, f.returnType.getText(), f.body, false));
 		}
 	}
 
@@ -123,13 +121,6 @@ public class Reader {
 		return args;
 	}
 
-	private void parseUniforms(UniformBlockContext uniformArgs) {
-		if(uniformArgs != null) {
-			for(UniformDefContext u : uniformArgs.uniforms) {
-				addDefinition(new UniformDef(u.uniformType.getText(), u.uniformName.getText()));
-			}
-		}
-	}
 
 	private void parseMatrices(ArgumentsContext matsArgs) {
 		if(matsArgs != null) {

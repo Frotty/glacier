@@ -14,19 +14,59 @@ shaderProg
 	'shader' shaderName = IDENTIFIER NL+ vertexShader fragmentShader
 ;
 
-functionBlock
-:
-	returnType=IDENTIFIER funcName=IDENTIFIER '(' arguements=arguments ')' NL body=statementsBlock
-;
-
 vertexShader
 :
-	'vert' NL+ STARTBLOCK? vshaderBlock ENDBLOCK NL*
+	'vert' NL+ STARTBLOCK? shaderBlock ENDBLOCK NL*
 ;
 
 fragmentShader
 :
-	'frag' NL+ STARTBLOCK? vshaderBlock ENDBLOCK NL*
+	'frag' NL+ STARTBLOCK? shaderBlock ENDBLOCK NL*
+;
+
+shaderBlock
+:
+	(
+		inBlock
+	)?
+	(
+		outBlock
+	)?
+	(
+		matricesBlock
+	)?
+	(
+		uniformsBlock
+	)?
+	(
+		'main()' NL+ mainFunc = statementsBlock
+	)? functions += functionBlock*
+;
+
+inBlock
+:
+	'in' NL+ STARTBLOCK inArgs = arguments NL+ ENDBLOCK
+;
+
+outBlock
+:
+	'out' NL+ STARTBLOCK outArgs = arguments NL+ ENDBLOCK
+;
+
+matricesBlock
+:
+	'matrices' NL+ STARTBLOCK matsArgs = arguments NL+ ENDBLOCK
+;
+
+uniformsBlock
+:
+	'uniforms' NL+ STARTBLOCK uniformArgs = arguments NL* ENDBLOCK
+;
+
+functionBlock
+:
+	returnType = IDENTIFIER funcName = IDENTIFIER '(' arguements = arguments ')'
+	NL body = statementsBlock
 ;
 
 varDef
@@ -39,47 +79,18 @@ arguments
 	(
 		vardefs += varDef
 		(
-			',' vardefs += varDef
+			(
+				','
+				| NL+
+			) vardefs += varDef
 		)*
 	)?
-;
-
-vshaderBlock
-:
-	(
-		'inout' NL+ STARTBLOCK inoutArgs = arguments NL+ ENDBLOCK
-	)?
-	(
-		'in' NL+ STARTBLOCK inArgs = arguments NL+ ENDBLOCK
-	)?
-	(
-		'out' NL+ STARTBLOCK outArgs = arguments NL+ ENDBLOCK
-	)?
-	(
-		'matrices' NL+ STARTBLOCK matsArgs = arguments NL+ ENDBLOCK
-	)?
-	(
-		'uniforms' NL+ STARTBLOCK uniformArgs = uniformBlock NL* ENDBLOCK
-	)?
-	(
-		'main()' NL+ mainFunc = statementsBlock
-	)? functions += functionBlock*
-;
-
-uniformBlock
-:
-	uniforms += uniformDef+
-;
-
-uniformDef
-:
-	uniformType = IDENTIFIER uniformName = IDENTIFIER NL
 ;
 
 statementsBlock
 :
 	(
-		STARTBLOCK statement* ENDBLOCK
+		STARTBLOCK stmts += statement* ENDBLOCK
 	)?
 ;
 
@@ -171,11 +182,7 @@ stmtSet
 
 localVarDef
 :
-	(
-		var = 'var'
-		| let = 'let'
-		| typeName = IDENTIFIER
-	) name = IDENTIFIER
+	typeName = IDENTIFIER name = IDENTIFIER
 	(
 		'=' initial = expr
 	)?
@@ -183,17 +190,17 @@ localVarDef
 
 expr
 :
-	exprPrimary
+	primary = exprPrimary
 	| receiver = expr dotsCall =
 	(
 		'.'
 		| '..'
-	) funcName = IDENTIFIER? '(' exprList ')'
+	) funcName = IDENTIFIER? '(' params = exprList ')'
 	| receiver = expr dotsVar =
 	(
 		'.'
 		| '..'
-	) varName = IDENTIFIER? indexes?
+	) varName = IDENTIFIER indexes?
 	| op = '-' right = expr
 	| left = expr op =
 	(
@@ -221,12 +228,12 @@ expr
 	| op = 'not' right = expr
 	| left = expr op = 'and' right = expr
 	| left = expr op = 'or' right = expr
-	| ieDirective '.' IDENTIFIER
+	| ieD = ieDirective '.' varName = IDENTIFIER
 ;
 
 exprPrimary
 :
-	exprFunctionCall
+	funcCall = exprFunctionCall
 	| varname = IDENTIFIER indexes?
 	| atom =
 	(
@@ -251,6 +258,8 @@ ieDirective
 	(
 		'in'
 		| 'out'
+		| 'mats'
+		| 'uni'
 	)
 ;
 
@@ -258,7 +267,7 @@ exprMemberVar
 :
 	(
 		expr
-		| ieDirective
+		| ieDirect = ieDirective
 	) dots =
 	(
 		'.'
@@ -278,7 +287,7 @@ indexes
 
 exprFunctionCall
 :
-	funcName = IDENTIFIER '(' exprList ')'
+	funcName = IDENTIFIER '(' params = exprList ')'
 ;
 
 exprList

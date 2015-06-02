@@ -13,6 +13,10 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+
 import antlr4.GlacierBaseListener;
 import antlr4.GlacierLexer;
 import antlr4.GlacierListener;
@@ -26,10 +30,10 @@ public class Tester {
 			String shaderFile = new String(Files.readAllBytes(Paths.get("./src/test/test.gl")));
 			Parser parser = new Parser();
 			System.out.println("Parsing Shader");
-			ShaderProgContext context = parser.parseShader(shaderFile);
+			String[] context = parser.parseShader(shaderFile);
 			System.out.println("Shader parsed.");
-			Reader r = new Reader("C:/Users/Frotty/Documents/GitHub/Metagine/");
-			r.read(context);
+//			Reader r = new Reader("C:/Users/Frotty/Documents/GitHub/Metagine/");
+//			r.read(context);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
