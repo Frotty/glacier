@@ -106,8 +106,8 @@ public class Reader {
 
 	private void readFunctions(List<FunctionBlockContext> functionBlock) {
 		for(FunctionBlockContext f : functionBlock) {
-			String[] args = parseArgs(f.arguements);
-			addFunction(new Function(f.funcName.getText(), args, f.returnType.getText(), f.body, false));
+//			String[] args = parseArgs(f.arguements);
+//			addFunction(new Function(f.funcName.getText(), args, f.returnType.getText(), f.body, false));
 		}
 	}
 

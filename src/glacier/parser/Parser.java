@@ -7,10 +7,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.DOTTreeGenerator;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
 import antlr4.GlacierBaseListener;
 import antlr4.GlacierLexer;
@@ -18,6 +25,7 @@ import antlr4.GlacierListener;
 import antlr4.GlacierParser;
 import antlr4.GlacierParser.ShaderProgContext;
 
+import org.antlr.*;
 public class Parser {
 	
 	public String[] parseShader(String grm) {
@@ -41,6 +49,18 @@ public class Parser {
         visitor = new PrintVisitor(al);
         visitor.visit(tree.fragmentShader());
         shaders[1] = visitor.out();
+        System.out.println(tree.toStringTree(parser));
+      //show AST in GUI
+        JFrame frame = new JFrame("Antlr AST");
+        JPanel panel = new JPanel();
+        TreeViewer viewr = new TreeViewer(Arrays.asList(
+                parser.getRuleNames()),tree);
+        viewr.setScale(0.75);//scale a little
+        panel.add(viewr);
+        frame.add(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(200,200);
+        frame.setVisible(true);
         return shaders;
 	}
 	
