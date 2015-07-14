@@ -8,9 +8,9 @@ public class ShortcutManager {
 	HashMap<String, Shortcut> funcshortcuts = new HashMap<>();
 	
 	public class Shortcut {
-		String name;
-		String type;
-		String scname;
+		public String name;
+		public String type;
+		public String scname;
 		public Shortcut(String scname, String type, String name) {
 			this.name = name;
 			this.type = type;

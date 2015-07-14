@@ -2,6 +2,7 @@ package glacier.parser;
 
 
 import glacier.util.ExtendedLexer;
+import glacier.visitors.PrintVisitor;
 
 import java.io.IOException;
 import java.nio.file.Files;

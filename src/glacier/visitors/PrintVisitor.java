@@ -1,10 +1,9 @@
-package glacier.parser;
+package glacier.visitors;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import glacier.parser.ShortcutManager;
 import glacier.parser.ShortcutManager.Shortcut;
 import antlr4.GlacierBaseVisitor;
 import antlr4.GlacierParser.ArgumentsContext;
@@ -21,13 +20,10 @@ import antlr4.GlacierParser.LocalVarDefContext;
 import antlr4.GlacierParser.MatricesBlockContext;
 import antlr4.GlacierParser.OutBlockContext;
 import antlr4.GlacierParser.ShaderBlockContext;
-import antlr4.GlacierParser.StatementContext;
-import antlr4.GlacierParser.StatementsBlockContext;
 import antlr4.GlacierParser.StmtReturnContext;
 import antlr4.GlacierParser.StmtSetContext;
 import antlr4.GlacierParser.UniformsBlockContext;
 import antlr4.GlacierParser.VarDefContext;
-import antlr4.GlacierParser.VertexShaderContext;
 
 public class PrintVisitor extends GlacierBaseVisitor<String> {
 	boolean isFragment = false;
