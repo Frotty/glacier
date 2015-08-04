@@ -61,4 +61,10 @@ public class UniformDef implements Definition{
 	public String getName() {
 		return nameL;
 	}
+
+	@Override
+	public String getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

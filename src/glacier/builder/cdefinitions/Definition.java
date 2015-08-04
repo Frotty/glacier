@@ -2,6 +2,7 @@ package glacier.builder.cdefinitions;
 
 public interface Definition {
 	public String getName();
+	public String getType();
 	public String generateLocVarSet();
 	public String generateLocVarDef();
 	public String generateInit();

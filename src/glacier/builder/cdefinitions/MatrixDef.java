@@ -8,15 +8,15 @@ public enum MatrixDef implements Definition {
 	public String generateLocVarSet() {
 		switch (this) {
 		case MVP:
-			return "u_MvpTrans = program.getUniformLocation(\"u_mvpTrans\");\n";
+			return "\t\tu_MvpTrans = program.getUniformLocation(\"u_mvpTrans\");\n";
 		case NORMAL:
-			return "u_NormalTrans = program.getUniformLocation(\"u_normalTrans\");\n";
+			return "\t\tu_NormalTrans = program.getUniformLocation(\"u_normalTrans\");\n";
 		case PROJ:
-			return "u_ProjTrans = program.getUniformLocation(\"u_projTrans\");\n";
+			return "\t\tu_ProjTrans = program.getUniformLocation(\"u_projTrans\");\n";
 		case VIEW:
-			return "u_ViewTrans = program.getUniformLocation(\"u_viewTrans\");\n";
+			return "\t\tu_ViewTrans = program.getUniformLocation(\"u_viewTrans\");\n";
 		case WORLD:
-			return "u_WorldTrans = program.getUniformLocation(\"u_worldTrans\");\n";
+			return "\t\tu_WorldTrans = program.getUniformLocation(\"u_worldTrans\");\n";
 		default:
 			break;
 		}
@@ -27,15 +27,15 @@ public enum MatrixDef implements Definition {
 	public String generateLocVarDef() {
 		switch (this) {
 		case MVP:
-			return "private int u_MvpTrans;\n\tprivate final Matrix4 tempMat4 = new Matrix4();\n";
+			return "\tprivate int u_MvpTrans;\n\tprivate final Matrix4 tempMat4 = new Matrix4();\n";
 		case NORMAL:
-			return "private int u_NormalTrans;\n";
+			return "\tprivate int u_NormalTrans;\n";
 		case PROJ:
-			return "private int u_ProjTrans;\n";
+			return "\tprivate int u_ProjTrans;\n";
 		case VIEW:
-			return "private int u_ViewTrans;\n";
+			return "\tprivate int u_ViewTrans;\n";
 		case WORLD:
-			return "private int u_WorldTrans;\n\tprivate final Matrix3 tempMat3 = new Matrix3();\n";
+			return "\tprivate int u_WorldTrans;\n\tprivate final Matrix3 tempMat3 = new Matrix3();\n";
 		default:
 			break;
 		}
@@ -133,6 +133,12 @@ public enum MatrixDef implements Definition {
 			break;
 		
 		}
+		return null;
+	}
+
+	@Override
+	public String getType() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

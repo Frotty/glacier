@@ -1,34 +1,20 @@
 package glacier.builder.cdefinitions;
 
-public class AttributeDef implements Definition {
-	public enum AttributeType {
-		INVERT, OUTVERT, INOUTVERT, INFRAG, OUTFRAG;
-	}
-	private String name;
-	private AttributeType attrType;
+public enum AttributeDef implements Definition {
+	POS, NORMAL, TEXCOORD;
 	
-	public AttributeDef(String attrName, AttributeType attrType) {
-		switch (attrName) {
-		case "pos":
-			name = "vec3 a_position;\n";
-			break;
-		case "normal":
-			name = "vec3 a_normal;\n";
-			break;
-		case "texCoord":
-			name = "vec2 a_texCoord0;\n";
-			break;
-		default:
-			name = attrName;
-			break;
-//			throw new RuntimeException("not implemented");
-		}
-		this.attrType = attrType;
-	}
-
 	@Override
-	public String generateLocVarSet() {
-		return "";
+	public String getType() {
+		switch(this) {
+		case NORMAL:
+			return "vec3";
+		case POS:
+			return "vec3";
+		case TEXCOORD:
+			return "vec2";
+		default:
+			return "";
+		}
 	}
 
 	@Override
@@ -53,39 +39,11 @@ public class AttributeDef implements Definition {
 
 	@Override
 	public String generateShaderInDef() {
-		switch (attrType) {
-		case INVERT:
-			return "in " + name;
-		case INOUTVERT:
-			return "in " + name;
-		case INFRAG:
-			return "in " + name.replace("a_", "v_");
-		case OUTFRAG:
-			break;
-		case OUTVERT:
-			break;
-		default:
-			break;
-		}
 		return "";
 	}
 
 	@Override
 	public String generateShaderOutDef() {
-		switch (attrType) {
-		case INOUTVERT:
-			return "out " + name.replace("a_", "v_");
-		case OUTVERT:
-			return "out " + name.replace("a_", "v_");
-		case INFRAG:
-			break;
-		case INVERT:
-			break;
-		case OUTFRAG:
-			break;
-		default:
-			break;
-		}
 		return "";
 	}
 
@@ -96,7 +54,13 @@ public class AttributeDef implements Definition {
 
 	@Override
 	public String getName() {
-		return name;
+		return "";
+	}
+
+	@Override
+	public String generateLocVarSet() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -26,16 +26,18 @@ public class <shadername>Shader implements Shader {
 	ShaderProgram program;
 	Camera camera;
 	RenderContext context;
+	String vert; 
+	String frag;
 	// Matrix and Uniform Locations
 	<otherMembersBlock>;
 	
-	
+	public <shadername>Shader(String vert, String frag) {
+		this.vert = vert;
+		this.frag = frag;
+	}
 	
 	@Override
 	public void init() {
-		// Load Vertex and Fragment Shader
-		String vert = Gdx.files.internal("shaders/<shadername>.vert.glsl").readString();
-		String frag = Gdx.files.internal("shaders/<shadername>.frag.glsl").readString();
 		// Create new Program from loaded shaders
 		program = new ShaderProgram(vert, frag);
 		// Check if the program compiled correctly
