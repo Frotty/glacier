@@ -3,33 +3,19 @@ package glacier.parser;
 import glacier.builder.LibgdxBuilder;
 import glacier.util.ExtendedLexer;
 import glacier.visitors.EvalVisitor;
-import glacier.visitors.FixVisitor;
+import glacier.visitors.TypeVisitor;
 import glacier.visitors.PrintVisitor;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.DOTTreeGenerator;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.gui.TreeViewer;
-
 import antlr4.GlacierBaseListener;
-import antlr4.GlacierLexer;
 import antlr4.GlacierListener;
 import antlr4.GlacierParser;
 import antlr4.GlacierParser.ShaderProgContext;
 import antlr4.GlacierParser.VarDefContext;
-
-import org.antlr.*;
 
 public class GlacierCompiler {
 
@@ -48,18 +34,21 @@ public class GlacierCompiler {
 		ShaderProgContext tree = parser.shaderProg();
 		ParseTreeWalker walker = new ParseTreeWalker();
 		GlacierListener listener = new GlacierBaseListener();
-		PrintVisitor visitor = new PrintVisitor(null);
+		EvalVisitor evalVisitor = new EvalVisitor();
+		evalVisitor.visit(tree);
+		TypeVisitor tV = new TypeVisitor(evalVisitor);
+		PrintVisitor visitor = new PrintVisitor(null, tV);
 		walker.walk(listener, tree);
 		output[0] = tree.shaderName.getText();
 		// Evaluate
 		System.out.println("\n\nEvaluating");
-		EvalVisitor evalVisitor = new EvalVisitor();
-		evalVisitor.visit(tree);
+		
+		
 		for(VarDefContext vdc : evalVisitor.matSet) {
 			System.out.println("mat " + vdc.varName.getText());
 		}
 		// Fixing
-		FixVisitor fixv = new FixVisitor(evalVisitor);
+		TypeVisitor fixv = new TypeVisitor(evalVisitor);
 		fixv.visit(tree);
 		// Print Shader Class
 		LibgdxBuilder libgdxBuilder = new LibgdxBuilder();
@@ -76,7 +65,7 @@ public class GlacierCompiler {
 		ArrayList<String> al = new ArrayList<>();
 		al.addAll(visitor.outVars());
 
-		visitor = new PrintVisitor(al);
+		visitor = new PrintVisitor(al, tV);
 		visitor.visit(tree.fragmentShader());
 		output[3] = visitor.out();
 		System.out.println(tree.toStringTree(parser));

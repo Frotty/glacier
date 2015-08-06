@@ -43,11 +43,11 @@ public class LibgdxBuilder {
 	public String otherMembersBlock() {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
-		sb.append("// Matrices\n");
+		sb.append("\t// Matrices\n");
 		for (VarDefContext vdc : evalV.matSet) {
 			appendMatrix(vdc, sb);
 		}
-		sb.append("\n// Uniforms\n");
+		sb.append("\n\t// Uniforms\n");
 		// Add Uniforms
 		for (VarDefContext vdc : evalV.uniformSet) {
 			sb.append("private int u_" + vdc.varName.getText() + ";\n");
@@ -58,11 +58,11 @@ public class LibgdxBuilder {
 	public String getLocationsBlock() {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
-		sb.append("// Matrices\n");
+		sb.append("\t\t// Matrices\n");
 		for (VarDefContext vdc : evalV.matSet) {
 			appendMatrixLoc(vdc, sb);
 		}
-		sb.append("\n// Uniforms\n");
+		sb.append("\n\t\t// Uniforms\n");
 		// Add Uniforms
 		for (VarDefContext vdc : evalV.uniformSet) {
 			sb.append("u_" + vdc.varName.getText() + " = program.getUniformLocation(\"u_" + vdc.varName.getText() + "\");\n");
@@ -79,7 +79,7 @@ public class LibgdxBuilder {
 	public String beginBlock() {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
-		sb.append("// Matrices\n");
+		sb.append("\t\t// Matrices\n");
 		for (VarDefContext vdc : evalV.matSet) {
 			appendMatrixBegin(vdc, sb);
 		}
@@ -89,7 +89,7 @@ public class LibgdxBuilder {
 	public String genInstance() {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
-		sb.append("// Matrices\n");
+		sb.append("\t\t// Matrices\n");
 		for (VarDefContext vdc : evalV.matSet) {
 			appendMatrixRender(vdc, sb);
 		}

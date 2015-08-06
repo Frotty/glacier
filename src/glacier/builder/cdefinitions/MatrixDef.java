@@ -55,9 +55,9 @@ public enum MatrixDef implements Definition {
 		case NORMAL:
 			return "";
 		case PROJ:
-			return "program.setUniformMatrix(u_ProjTrans, camera.projection);\n";
+			return "\t\tprogram.setUniformMatrix(u_ProjTrans, camera.projection);\n";
 		case VIEW:
-			return "program.setUniformMatrix(u_ViewTrans, camera.view);\n";
+			return "\t\tprogram.setUniformMatrix(u_ViewTrans, camera.view);\n";
 		case WORLD:
 			return "";
 		default:
@@ -70,15 +70,15 @@ public enum MatrixDef implements Definition {
 	public String generateInstance() {
 		switch (this) {
 		case MVP:
-			return "tempMat4.set(camera.combined).mul(renderable.worldTransform);\n\t\tprogram.setUniformMatrix(u_MvpTrans, tempMat4);\n";
+			return "\t\ttempMat4.set(camera.combined).mul(renderable.worldTransform);\n\t\tprogram.setUniformMatrix(u_MvpTrans, tempMat4);\n";
 		case NORMAL:
-			return "tempMat3.set(renderable.worldTransform).inv().transpose();\n\t\tprogram.setUniformMatrix(u_NormalTrans, tempMat3);\n";
+			return "\t\ttempMat3.set(renderable.worldTransform).inv().transpose();\n\t\tprogram.setUniformMatrix(u_NormalTrans, tempMat3);\n";
 		case PROJ:
 			return "";
 		case VIEW:
 			return "";
 		case WORLD:
-			return "program.setUniformMatrix(u_WorldTrans, renderable.worldTransform);\n";
+			return "\t\tprogram.setUniformMatrix(u_WorldTrans, renderable.worldTransform);\n";
 		default:
 			break;
 		

@@ -34,7 +34,9 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 	private ArrayList<String> outVars = new ArrayList<>();
 	private int layoutCount = 0;
 
-	public PrintVisitor(ArrayList<String> vertexVarying) {
+	TypeVisitor typeVisitor;
+	public PrintVisitor(ArrayList<String> vertexVarying, TypeVisitor typeVisitor) {
+		this.typeVisitor = typeVisitor;
 		scman.loadDefaultShortcuts();
 		this.isFragment = vertexVarying != null;
 		if(isFragment) {
@@ -222,7 +224,13 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 			if(expr.op.getText().equals("*")) {
 				// Fix for "mul(mat4, vec3)"
 				print(" " + expr.op.getText() + " ");
-				visit(expr.right);
+				if(typeVisitor.visit(expr.left).equals("mat4") && typeVisitor.visit(expr.right).equals("vec3")) {
+					print("vec4(");
+					visit(expr.right);
+					print(", 1.0)");
+				} else {
+					visit(expr.right);
+				}
 			} else {
 				print(" " + expr.op.getText() + " ");
 				visit(expr.right);
