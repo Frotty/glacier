@@ -7,16 +7,12 @@ import glacier.builder.cdefinitions.VariableDef;
 import glacier.parser.VariableManager;
 import glacier.parser.VariableManager.GlobalType;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 import antlr4.GlacierBaseVisitor;
 import antlr4.GlacierParser.ExprMemberVarContext;
 import antlr4.GlacierParser.InBlockContext;
-import antlr4.GlacierParser.MatricesBlockContext;
 import antlr4.GlacierParser.OutBlockContext;
 import antlr4.GlacierParser.ShaderProgContext;
+import antlr4.GlacierParser.TransBlockContext;
 import antlr4.GlacierParser.UniformsBlockContext;
 import antlr4.GlacierParser.VarDefContext;
 
@@ -78,8 +74,8 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 	}
 
 	@Override
-	public String visitMatricesBlock(MatricesBlockContext ctx) {
-		for (VarDefContext matdef : ctx.matsArgs.vardefs) {
+	public String visitTransBlock(TransBlockContext ctx) {
+		for (VarDefContext matdef : ctx.transArgs.vardefs) {
 			MatrixDef def;
 			switch (matdef.varName.getText()) {
 			case "mvp":
@@ -100,7 +96,7 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 			default:
 				throw new RuntimeException("not existing");
 			}
-			varManager.saveGlobal(GlobalType.MATS, vert, def);
+			varManager.saveGlobal(GlobalType.TRANS, vert, def);
 		}
 		return "matBlock";
 	}

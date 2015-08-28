@@ -52,10 +52,13 @@ shaderBlock
 		outBlock
 	)?
 	(
-		matricesBlock
+		transBlock
 	)?
 	(
 		uniformsBlock
+	)?
+	(
+		materialBlock
 	)?
 	(
 		'main()' NL+ mainFunc = statementsBlock
@@ -72,14 +75,19 @@ outBlock
 	'out' NL+ STARTBLOCK outArgs = arguments NL+ ENDBLOCK
 ;
 
-matricesBlock
+transBlock
 :
-	'matrices' NL+ STARTBLOCK matsArgs = arguments NL+ ENDBLOCK
+	'trans' NL+ STARTBLOCK transArgs = arguments NL+ ENDBLOCK
 ;
 
 uniformsBlock
 :
-	'uniforms' NL+ STARTBLOCK uniformArgs = arguments NL* ENDBLOCK
+	'uni' NL+ STARTBLOCK uniformArgs = arguments NL* ENDBLOCK
+;
+
+materialBlock
+:
+	'mat' NL+ STARTBLOCK materialArgs = arguments NL* ENDBLOCK
 ;
 
 functionBlock
@@ -247,7 +255,7 @@ expr
 	| op = 'not' right = expr
 	| left = expr op = 'and' right = expr
 	| left = expr op = 'or' right = expr
-	| ieD = ieDirective '.' varName = IDENTIFIER
+	| ieD = globalType '.' varName = IDENTIFIER
 ;
 
 exprPrimary
@@ -272,13 +280,14 @@ exprAssignable
 	| exprVarAccess
 ;
 
-ieDirective
+globalType
 :
 	(
 		'in'
 		| 'out'
-		| 'mats'
+		| 'trans'
 		| 'uni'
+		| 'mat'
 	)
 ;
 
@@ -286,7 +295,7 @@ exprMemberVar
 :
 	(
 		expr
-		| ieDirect = ieDirective
+		| ieDirect = globalType
 	) dots =
 	(
 		'.'

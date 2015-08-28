@@ -8,7 +8,7 @@ import glacier.builder.cdefinitions.Definition;
 
 public class VariableManager {
 	public enum GlobalType {
-		IN, OUT, MATS, UNI
+		IN, OUT, TRANS, UNI, MAT
 	}
 
 	// Vertex Data
@@ -18,6 +18,8 @@ public class VariableManager {
 	private Set<Definition> vertOutSet = new HashSet<>();
 	private HashMap<String, Definition> vertUniformReg = new HashMap<>();
 	private Set<Definition> vertUniformSet = new HashSet<>();
+	private HashMap<String, Definition> vertTransReg = new HashMap<>();
+	private Set<Definition> vertTransSet = new HashSet<>();
 	private HashMap<String, Definition> vertMatReg = new HashMap<>();
 	private Set<Definition> vertMatSet = new HashSet<>();
 	// Fragment Data
@@ -25,6 +27,8 @@ public class VariableManager {
 	private Set<Definition> fragOutSet = new HashSet<>();
 	private HashMap<String, Definition> fragUniformReg = new HashMap<>();
 	private Set<Definition> fragUniformSet = new HashSet<>();
+	private HashMap<String, Definition> fragTransReg = new HashMap<>();
+	private Set<Definition> fragTransSet = new HashSet<>();
 	private HashMap<String, Definition> fragMatReg = new HashMap<>();
 	private Set<Definition> fragMatSet = new HashSet<>();
 	
@@ -32,12 +36,14 @@ public class VariableManager {
 		switch (type) {
 		case IN:
 			return vert ? vertInSet : vertOutSet;
-		case MATS:
-			return vert ? vertMatSet : fragMatSet;
+		case TRANS:
+			return vert ? vertTransSet : fragTransSet;
 		case OUT:
 			return vert ? vertOutSet : fragOutSet;
 		case UNI:
 			return vert ? vertUniformSet : fragUniformSet;
+		case MAT:
+			return vert ? vertMatSet : fragMatSet;
 		default:
 			return null;
 		}
@@ -50,9 +56,9 @@ public class VariableManager {
 			defs.addAll(vertInSet);
 			defs.addAll(vertOutSet);
 			break;
-		case MATS:
-			defs.addAll(vertMatSet);
-			defs.addAll(fragMatSet);
+		case TRANS:
+			defs.addAll(vertTransSet);
+			defs.addAll(fragTransSet);
 			break;
 		case OUT:
 			defs.addAll(vertOutSet);
@@ -61,6 +67,10 @@ public class VariableManager {
 		case UNI:
 			defs.addAll(vertUniformSet);
 			defs.addAll(fragUniformSet);
+			break;
+		case MAT:
+			defs.addAll(vertMatSet);
+			defs.addAll(fragMatSet);
 			break;
 		default:
 			break;
@@ -91,16 +101,16 @@ public class VariableManager {
 				throw new UnsupportedOperationException("Fragment should not have in");
 			}
 			break;
-		case MATS:
+		case TRANS:
 			if(vert) {
-				if(! vertMatReg.containsKey(def.getName())) {
-					vertMatReg.put(def.getName(), def);
-					vertMatSet.add(def);
+				if(! vertTransReg.containsKey(def.getName())) {
+					vertTransReg.put(def.getName(), def);
+					vertTransSet.add(def);
 				}
 			} else {
-				if(! fragMatReg.containsKey(def.getName())) {
-					fragMatReg.put(def.getName(), def);
-					fragMatSet.add(def);
+				if(! fragTransReg.containsKey(def.getName())) {
+					fragTransReg.put(def.getName(), def);
+					fragTransSet.add(def);
 				}
 			}
 			break;
@@ -131,6 +141,20 @@ public class VariableManager {
 				}
 			}
 			break;
+		case MAT:
+			System.out.println("Saving uni: " + def.getName());
+			if(vert) {
+				if(! vertMatReg.containsKey(def.getName())) {
+					vertMatReg.put(def.getName(), def);
+					vertMatSet.add(def);
+				}
+			} else {
+				if(! fragMatReg.containsKey(def.getName())) {
+					fragMatReg.put(def.getName(), def);
+					fragMatSet.add(def);
+				}
+			}
+			break;
 		default:
 			throw new UnsupportedOperationException("Global Type not implemented");
 		}
@@ -151,11 +175,11 @@ public class VariableManager {
 			} else {
 				return vertOutReg.get(name);
 			}
-		case MATS:
+		case TRANS:
 			if(vert) {
-				return vertMatReg.get(name);
+				return vertTransReg.get(name);
 			} else {
-				return fragMatReg.get(name);
+				return fragTransReg.get(name);
 			}
 		case OUT:
 			if(vert) {
@@ -168,6 +192,12 @@ public class VariableManager {
 				return vertUniformReg.get(name);
 			} else {
 				return fragUniformReg.get(name);
+			}
+		case MAT:
+			if(vert) {
+				return vertMatReg.get(name);
+			} else {
+				return fragMatReg.get(name);
 			}
 		default:
 			throw new UnsupportedOperationException("Global Type not implemented");

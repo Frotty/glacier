@@ -1,8 +1,12 @@
 package glacier.visitors;
 
 import java.util.ArrayList;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import com.sun.javafx.geom.Matrix3f;
+
+import glacier.builder.cdefinitions.MatrixDef;
 import glacier.parser.ShortcutManager;
 import glacier.parser.ShortcutManager.Shortcut;
 import antlr4.GlacierBaseVisitor;
@@ -17,11 +21,12 @@ import antlr4.GlacierParser.FragmentShaderContext;
 import antlr4.GlacierParser.FunctionBlockContext;
 import antlr4.GlacierParser.InBlockContext;
 import antlr4.GlacierParser.LocalVarDefContext;
-import antlr4.GlacierParser.MatricesBlockContext;
+import antlr4.GlacierParser.MaterialBlockContext;
 import antlr4.GlacierParser.OutBlockContext;
 import antlr4.GlacierParser.ShaderBlockContext;
 import antlr4.GlacierParser.StmtReturnContext;
 import antlr4.GlacierParser.StmtSetContext;
+import antlr4.GlacierParser.TransBlockContext;
 import antlr4.GlacierParser.UniformsBlockContext;
 import antlr4.GlacierParser.VarDefContext;
 
@@ -102,7 +107,10 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 				print("v_");
 			}
 			break;
-		case "mats":
+		case "trans":
+			print("t_");
+			break;
+		case "mat":
 			print("m_");
 			break;
 		case "uni":
@@ -139,6 +147,17 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 		// Uniforms
 		print("uniform " + ctx.varType.getText() + " u_" + ctx.varName.getText() + ";");
 	}
+	
+	public void visitTransDef(VarDefContext ctx) {
+		// Uniforms
+		print("uniform " + ctx.varType.getText() + " t_" + ctx.varName.getText() + ";");
+	}
+	
+	public void visitMatDef(VarDefContext ctx) {
+		// Uniforms
+		print("uniform " + ctx.varType.getText() + " m_" + ctx.varName.getText() + ";");
+	}
+	
 
 	public void visitOutVarDef(VarDefContext ctx, boolean frag) {
 		if (frag) {
@@ -168,6 +187,10 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 			visitOutVarDef(ctx, frag);
 		} else if (parent instanceof UniformsBlockContext) {
 			visitUniformDef(ctx);
+		} else if (parent instanceof TransBlockContext) {
+			visitTransDef(ctx);
+		} else if (parent instanceof MaterialBlockContext) {
+			visitMatDef(ctx);
 		}
 		newline();
 		return "";
@@ -258,10 +281,10 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 				print(expr.varName.getText());
 			} else {
 				Shortcut sc = scman.getIEDShortcut(expr.varName.getText());
-				if (sc != null && !expr.ieD.getText().equals("mats") && !isFragment) {
+				if (sc != null && !expr.ieD.getText().equals("trans") && !isFragment) {
 					print(sc.name);
 				} else {
-					sc = scman.getMatShortcut(expr.varName.getText());
+					sc = scman.getTransShortcut(expr.varName.getText());
 					if (sc != null) {
 						print(sc.name);
 					} else {
@@ -282,11 +305,16 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 	}
 
 	@Override
-	public String visitMatricesBlock(MatricesBlockContext ctx) {
-		for (VarDefContext def : ctx.matsArgs.vardefs) {
-			Shortcut sc = scman.getMatShortcut(def.varName.getText());
-			print("uniform " + sc.type + " m_" + sc.name + ";");
-			newline();
+	public String visitTransBlock(TransBlockContext ctx) {
+		for (VarDefContext def : ctx.transArgs.vardefs) {
+			try {
+				MatrixDef md = MatrixDef.valueOf(def.varName.getText().toUpperCase());
+				print(md.generateShaderUniDef());
+				newline();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		}
 		return "";
 	}
@@ -322,13 +350,13 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 		if (expr.ieDirect != null) {
 			resolveIEDirective(expr.ieDirect.getText());
 			Shortcut sc = scman.getIEDShortcut(expr.varname.getText());
-			Shortcut msc = scman.getMatShortcut(expr.varname.getText());
+			Shortcut tsc = scman.getTransShortcut(expr.varname.getText());
 			if (isFragment && expr.ieDirect.getText().equals("in")) {
 				print(expr.varname.getText());
 			} else if (expr.ieDirect.getText().equals("out")) {
 				print(expr.varname.getText());
-			} else if (expr.ieDirect.getText().equals("mats")) {
-				print(msc.name);
+			} else if (expr.ieDirect.getText().equals("trans")) {
+				print(tsc.name);
 			} else if (sc != null) {
 				print(sc.name);
 			} else {
@@ -341,7 +369,7 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 	@Override
 	public String visitExprVarAccess(ExprVarAccessContext expr) {
 		Shortcut sc = scman.getIEDShortcut(expr.varname.getText());
-		Shortcut msc = scman.getMatShortcut(expr.varname.getText());
+		Shortcut msc = scman.getTransShortcut(expr.varname.getText());
 		if (sc != null) {
 			print(sc.name);
 		} else if (expr.varname.getText().equals("gl_Pos")) {
@@ -416,8 +444,8 @@ public class PrintVisitor extends GlacierBaseVisitor<String> {
 			visit(ctx.outBlock());
 		}
 		newline();
-		if (ctx.matricesBlock() != null) {
-			visit(ctx.matricesBlock());
+		if (ctx.transBlock() != null) {
+			visit(ctx.transBlock());
 		}
 		newline();
 		if (ctx.uniformsBlock() != null) {

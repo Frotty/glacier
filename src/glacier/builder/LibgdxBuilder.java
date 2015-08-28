@@ -41,7 +41,7 @@ public class LibgdxBuilder {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
 		sb.append("\t// Matrices\n");
-		for (Definition vdc : vm.getGlobalSet(GlobalType.MATS)) {
+		for (Definition vdc : vm.getGlobalSet(GlobalType.TRANS)) {
 			sb.append(vdc.generateLocVarDef());
 		}
 		sb.append("\n\t// Uniforms\n");
@@ -56,7 +56,7 @@ public class LibgdxBuilder {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
 		sb.append("\t\t// Matrices\n");
-		for (Definition vdc : vm.getGlobalSet(GlobalType.MATS)) {
+		for (Definition vdc : vm.getGlobalSet(GlobalType.TRANS)) {
 			sb.append(vdc.generateLocVarSet());
 		}
 		sb.append("\n\t\t// Uniforms\n");
@@ -77,7 +77,7 @@ public class LibgdxBuilder {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
 		sb.append("\t\t// Matrices\n");
-		for (Definition vdc : vm.getGlobalSet(GlobalType.MATS)) {
+		for (Definition vdc : vm.getGlobalSet(GlobalType.TRANS)) {
 			sb.append((vdc).generateBlock());
 		}
 		return sb.toString();
@@ -87,7 +87,7 @@ public class LibgdxBuilder {
 		StringBuilder sb = new StringBuilder();
 		// Add Mats
 		sb.append("\t\t// Matrices\n");
-		for (Definition vdc : vm.getGlobalSet(GlobalType.MATS)) {
+		for (Definition vdc : vm.getGlobalSet(GlobalType.TRANS)) {
 			sb.append(vdc.generateInstance());
 		}
 		return sb.toString();

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class ShortcutManager {
 	HashMap<String, Shortcut> iedshortcuts = new HashMap<>();
-	HashMap<String, Shortcut> matshortcuts = new HashMap<>();
+	HashMap<String, Shortcut> transshortcuts = new HashMap<>();
 	HashMap<String, Shortcut> funcshortcuts = new HashMap<>();
 	
 	public class Shortcut {
@@ -22,8 +22,9 @@ public class ShortcutManager {
 		iedshortcuts.put(sc.scname, sc);
 	}
 	
-	public void addMatShortcut(Shortcut sc) {
-		matshortcuts.put(sc.scname, sc);
+	
+	public void addTransShortcut(Shortcut sc) {
+		transshortcuts.put(sc.scname, sc);
 	}
 	
 	public void addFuncShortcut(Shortcut sc) {
@@ -37,12 +38,13 @@ public class ShortcutManager {
 		return null;
 	}
 	
-	public Shortcut getMatShortcut(String scname) {
-		if(matshortcuts.containsKey(scname)) {
-			return matshortcuts.get(scname);
+	public Shortcut getTransShortcut(String scname) {
+		if(transshortcuts.containsKey(scname)) {
+			return transshortcuts.get(scname);
 		}
 		return null;
 	}
+	
 
 	public void loadDefaultShortcuts() {
 		// Geometry Data
@@ -50,11 +52,12 @@ public class ShortcutManager {
 		addIEDShortcut(new Shortcut("normal", "vec3", "normal"));
 		addIEDShortcut(new Shortcut("texCoord", "vec2", "texCoord0"));
 		// Camera-Matrices
-		addMatShortcut(new Shortcut("world", "mat4", "worldTrans"));
-		addMatShortcut(new Shortcut("view", "mat4", "viewTrans"));
-		addMatShortcut(new Shortcut("proj", "mat4", "projTrans"));
-		addMatShortcut(new Shortcut("normal", "mat3", "normalTrans"));
-		addMatShortcut(new Shortcut("mvp", "mat4", "mvpTrans"));
+		addTransShortcut(new Shortcut("world", "mat4", "worldTrans"));
+		addTransShortcut(new Shortcut("view", "mat4", "viewTrans"));
+		addTransShortcut(new Shortcut("proj", "mat4", "projTrans"));
+		addTransShortcut(new Shortcut("normal", "mat3", "normalTrans"));
+		addTransShortcut(new Shortcut("mvp", "mat4", "mvpTrans"));
+		// Material
 		// Functions
 		addFuncShortcut(new Shortcut("norm", "vec4", "normalize"));
 	}

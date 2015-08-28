@@ -100,15 +100,15 @@ public enum MatrixDef implements Definition {
 	public String generateShaderUniDef() {
 		switch (this) {
 		case MVP:
-			return "uniform mat4 u_mvpTrans;\n";
+			return "uniform mat4 t_mvpTrans;\n";
 		case NORMAL:
-			return "uniform mat3 u_normalTrans;\n";
+			return "uniform mat3 t_normalTrans;\n";
 		case PROJ:
-			return "uniform mat4 u_projTrans;\n";
+			return "uniform mat4 t_projTrans;\n";
 		case VIEW:
-			return "uniform mat4 u_viewTrans;\n";
+			return "uniform mat4 t_viewTrans;\n";
 		case WORLD:
-			return "uniform mat4 u_worldTrans;\n";
+			return "uniform mat4 t_worldTrans;\n";
 		default:
 			break;
 		
@@ -120,15 +120,15 @@ public enum MatrixDef implements Definition {
 	public String getName() {
 		switch (this) {
 		case MVP:
-			return "u_mvpTrans";
+			return "t_mvpTrans";
 		case NORMAL:
-			return "u_normalTrans";
+			return "t_normalTrans";
 		case PROJ:
-			return "u_projTrans";
+			return "t_projTrans";
 		case VIEW:
-			return "u_viewTrans";
+			return "t_viewTrans";
 		case WORLD:
-			return "u_worldTrans";
+			return "t_worldTrans";
 		default:
 			break;
 		
