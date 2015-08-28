@@ -2,7 +2,10 @@ package glacier.visitors;
 
 import glacier.builder.cdefinitions.AttributeDef;
 import glacier.builder.cdefinitions.MatrixDef;
+import glacier.builder.cdefinitions.UniformDef;
 import glacier.builder.cdefinitions.VariableDef;
+import glacier.parser.VariableManager;
+import glacier.parser.VariableManager.GlobalType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,22 +13,28 @@ import java.util.Set;
 
 import antlr4.GlacierBaseVisitor;
 import antlr4.GlacierParser.ExprMemberVarContext;
-import antlr4.GlacierParser.FunctionBlockContext;
 import antlr4.GlacierParser.InBlockContext;
 import antlr4.GlacierParser.MatricesBlockContext;
 import antlr4.GlacierParser.OutBlockContext;
-import antlr4.GlacierParser.ShaderBlockContext;
+import antlr4.GlacierParser.ShaderProgContext;
+import antlr4.GlacierParser.UniformsBlockContext;
 import antlr4.GlacierParser.VarDefContext;
 
 public class EvalVisitor extends GlacierBaseVisitor<String> {
-	public HashMap<String, VariableDef> inReg = new HashMap<>();
-	public Set<VarDefContext> inSet = new HashSet<>();
-	public HashMap<String, VariableDef> outReg = new HashMap<>();
-	public Set<VarDefContext> outSet = new HashSet<>();
-	public HashMap<String, VariableDef> uniformReg = new HashMap<>();
-	public Set<VarDefContext> uniformSet = new HashSet<>();
-	public HashMap<String, VariableDef> matReg = new HashMap<>();
-	public Set<VarDefContext> matSet = new HashSet<>();
+	VariableManager varManager;
+	private boolean vert = true;
+
+	public EvalVisitor(VariableManager variableManager) {
+		varManager = variableManager;
+	}
+
+	@Override
+	public String visitShaderProg(ShaderProgContext ctx) {
+		visit(ctx.vertexShader());
+		vert = false;
+		visit(ctx.fragmentShader());
+		return null;
+	}
 
 	@Override
 	public String visitInBlock(InBlockContext ctx) {
@@ -47,8 +56,7 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 				throw new RuntimeException("not existing");
 			}
 			VariableDef vdef = new VariableDef(indef.varName.getText(), def.getType());
-			inReg.put(vdef.name, vdef);
-			inSet.add(indef);
+			varManager.saveGlobal(GlobalType.IN, vert, vdef);
 		}
 		return "";
 	}
@@ -59,13 +67,12 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 		for (VarDefContext outdef : ctx.outArgs.vardefs) {
 			System.out.println("added: " + outdef.varName.getText());
 			VariableDef vdef;
-			if(outdef.varType != null) {
+			if (outdef.varType != null) {
 				vdef = new VariableDef(outdef.varName.getText(), outdef.varType.getText());
 			} else {
 				vdef = new VariableDef(outdef.varName.getText(), "vec4");
 			}
-			outReg.put(outdef.varName.getText(), vdef);
-			outSet.add(outdef);
+			varManager.saveGlobal(GlobalType.OUT, vert, vdef);
 		}
 		return "";
 	}
@@ -93,12 +100,18 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 			default:
 				throw new RuntimeException("not existing");
 			}
-			if(! matReg.containsKey(matdef.varName.getText())) {
-				matReg.put(matdef.varName.getText(), new VariableDef(matdef.varName.getText(), def.getType()));
-				matSet.add(matdef);
-			}
+			varManager.saveGlobal(GlobalType.MATS, vert, def);
 		}
 		return "matBlock";
+	}
+
+	@Override
+	public String visitUniformsBlock(UniformsBlockContext ctx) {
+		for (VarDefContext unidef : ctx.uniformArgs.vardefs) {
+			UniformDef def = new UniformDef(unidef.varType.getText(), unidef.varName.getText());
+			varManager.saveGlobal(GlobalType.UNI, vert, def);
+		}
+		return "uniBlock";
 	}
 
 	@Override
@@ -107,28 +120,20 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 			// Is Implicit Access
 			switch (ctx.ieDirect.getText()) {
 			case "in":
-				if (inHas(ctx.varname.getText())) {
+				if (varManager.globalExists(GlobalType.IN, vert, ctx.varname.getText())) {
 					return toOutInVar(ctx.varname.getText());
 				} else {
-					throw new RuntimeException("Undefine in variable");
+					throw new UnsupportedOperationException("Undefine in variable " + ctx.varname.getText());
 				}
 			case "out":
-				if (outHas(ctx.varname.getText())) {
+				if (varManager.globalExists(GlobalType.OUT, vert, ctx.varname.getText())) {
 					return toOutInVar(ctx.varname.getText());
 				} else {
-					throw new RuntimeException("Undefined out variable: " + ctx.varname.getText());
+					throw new UnsupportedOperationException("Undefined out variable: " + ctx.varname.getText());
 				}
 			}
 		}
 		return "";
-	}
-
-	private boolean outHas(String text) {
-		return outReg.containsKey(text);
-	}
-
-	private boolean inHas(String text) {
-		return inReg.containsKey(text);
 	}
 
 	private String toOutInVar(String text) {
@@ -144,33 +149,33 @@ public class EvalVisitor extends GlacierBaseVisitor<String> {
 		}
 	}
 
-	public String getVarType(String iED, String text) {
-		switch (iED) {
-		case "in":
-			if (inReg.containsKey(text)) {
-				return inReg.get(text).type;
-			}
-		case "out":
-			if (outReg.containsKey(text)) {
-				return outReg.get(text).type;
-			}
-		case "mats":
-			if (matReg.containsKey(text)) {
-				switch (text) {
-				case "mvp":
-					return MatrixDef.MVP.generateShaderUniDef().substring(8, 12);
-				case "view":
-					return MatrixDef.VIEW.generateShaderUniDef().substring(8, 12);
-				case "normal":
-					return MatrixDef.NORMAL.generateShaderUniDef().substring(8, 12);
-				case "world":
-					return MatrixDef.WORLD.generateShaderUniDef().substring(8, 12);
-				case "proj":
-					return MatrixDef.PROJ.generateShaderUniDef().substring(8, 12);
-				}
-			}
-		}
-		return "unknown";
-	}
+//	public String getVarType(String iED, String text) {
+//		switch (iED) {
+//		case "in":
+//			if (inReg.containsKey(text)) {
+//				return inReg.get(text).type;
+//			}
+//		case "out":
+//			if (outReg.containsKey(text)) {
+//				return outReg.get(text).type;
+//			}
+//		case "mats":
+//			if (matReg.containsKey(text)) {
+//				switch (text) {
+//				case "mvp":
+//					return MatrixDef.MVP.generateShaderUniDef().substring(8, 12);
+//				case "view":
+//					return MatrixDef.VIEW.generateShaderUniDef().substring(8, 12);
+//				case "normal":
+//					return MatrixDef.NORMAL.generateShaderUniDef().substring(8, 12);
+//				case "world":
+//					return MatrixDef.WORLD.generateShaderUniDef().substring(8, 12);
+//				case "proj":
+//					return MatrixDef.PROJ.generateShaderUniDef().substring(8, 12);
+//				}
+//			}
+//		}
+//		return "unknown";
+//	}
 
 }

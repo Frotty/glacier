@@ -8,15 +8,15 @@ public enum MatrixDef implements Definition {
 	public String generateLocVarSet() {
 		switch (this) {
 		case MVP:
-			return "\t\tu_MvpTrans = program.getUniformLocation(\"u_mvpTrans\");\n";
+			return "\t\tu_MvpTrans = program.getUniformLocation(\"m_mvpTrans\");\n";
 		case NORMAL:
-			return "\t\tu_NormalTrans = program.getUniformLocation(\"u_normalTrans\");\n";
+			return "\t\tu_NormalTrans = program.getUniformLocation(\"m_normalTrans\");\n";
 		case PROJ:
-			return "\t\tu_ProjTrans = program.getUniformLocation(\"u_projTrans\");\n";
+			return "\t\tu_ProjTrans = program.getUniformLocation(\"m_projTrans\");\n";
 		case VIEW:
-			return "\t\tu_ViewTrans = program.getUniformLocation(\"u_viewTrans\");\n";
+			return "\t\tu_ViewTrans = program.getUniformLocation(\"m_viewTrans\");\n";
 		case WORLD:
-			return "\t\tu_WorldTrans = program.getUniformLocation(\"u_worldTrans\");\n";
+			return "\t\tu_WorldTrans = program.getUniformLocation(\"m_worldTrans\");\n";
 		default:
 			break;
 		}

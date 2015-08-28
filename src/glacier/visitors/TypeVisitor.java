@@ -1,16 +1,21 @@
 package glacier.visitors;
 
+import glacier.builder.cdefinitions.Definition;
+import glacier.parser.VariableManager;
+import glacier.parser.VariableManager.GlobalType;
 import antlr4.GlacierBaseVisitor;
 import antlr4.GlacierParser.ExprContext;
 import antlr4.GlacierParser.ExprPrimaryContext;
 
 public class TypeVisitor extends GlacierBaseVisitor<String> {
-	private EvalVisitor evalV;
+	private VariableManager varManager;
+	private boolean vert;
 
-	public TypeVisitor(EvalVisitor evalV) {
-		this.evalV = evalV;
+	public TypeVisitor(VariableManager varManager, boolean vert) {
+		this.varManager = varManager;
+		this.vert = vert;
 	}
-	
+
 	@Override
 	public String visitExpr(ExprContext ctx) {
 		if(ctx.op != null && ctx.left != null && ctx.right != null) {
@@ -22,15 +27,23 @@ public class TypeVisitor extends GlacierBaseVisitor<String> {
 				}
 			}
 		}
-		if(ctx.ieD != null) {
-			return evalV.getVarType(ctx.ieD.getText(), ctx.varName.getText());
+		if(ctx.ieD != null && ctx.varName != null) {
+			System.out.println(GlobalType.valueOf(ctx.ieD.getText().toUpperCase()));
+			System.out.println(ctx.varName.getText());
+			Definition global = varManager.getGlobal(GlobalType.valueOf(ctx.ieD.getText().toUpperCase()), vert, ctx.varName.getText());
+			if(global != null) {
+				return global.getType();
+			} else {
+				return "unknown";
+			}
+			
 		}
 		return "";
 	}
-	
+
 	@Override
 	public String visitExprPrimary(ExprPrimaryContext ctx) {
-		if(ctx.varname != null) {
+		if (ctx.varname != null) {
 			// Local variable ?
 		}
 		return "primaryUnknown";

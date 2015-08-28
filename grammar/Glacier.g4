@@ -11,8 +11,27 @@ package antlr4;
 
 shaderProg
 :
-	'shader' shaderName = IDENTIFIER NL+ vertexShader fragmentShader
+	'shader' shaderName = IDENTIFIER NL+ glacierHeader vertexShader fragmentShader
 ;
+
+glacierHeader
+:
+	drawDirective NL* contextOptions?
+;
+
+
+drawDirective: 
+	'draw' drawDirect=('geometry'|'fullscreen') NL
+;
+
+contextOptions: 
+	'context' '[' (options+=contextOpt ',')* options+=contextOpt? ']' NL
+;
+
+contextOpt:
+	optionName= IDENTIFIER ('=' optionValue = IDENTIFIER)?
+;
+
 
 vertexShader
 :

@@ -1,22 +1,13 @@
 package glacier.builder.cdefinitions;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import antlr4.GlacierParser.ExprMemberVarContext;
-import antlr4.GlacierParser.StatementContext;
 import antlr4.GlacierParser.StatementsBlockContext;
-import antlr4.GlacierParser.StmtSetContext;
 
 public class Function {
 	String name;

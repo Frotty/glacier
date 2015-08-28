@@ -1,14 +1,14 @@
 package glacier.builder.cdefinitions;
 
 public interface Definition {
-	public String getName();
-	public String getType();
-	public String generateLocVarSet();
-	public String generateLocVarDef();
-	public String generateInit();
-	public String generateBlock();
-	public String generateInstance();
-	public String generateShaderInDef();
-	public String generateShaderOutDef();
-	public String generateShaderUniDef();
+	public abstract String getName();
+	public abstract String getType();
+	public abstract String generateLocVarSet();
+	public abstract String generateLocVarDef();
+	public abstract String generateInit();
+	public abstract String generateBlock();
+	public abstract String generateInstance();
+	public abstract String generateShaderInDef();
+	public abstract String generateShaderOutDef();
+	public abstract String generateShaderUniDef();
 }
